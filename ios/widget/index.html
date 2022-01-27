@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Print</title>
+    <!--Script-->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/rajmandal800/SamplePrintApp@main/epos-2.18.0.js"   ></script>
+    
+    <script type="text/javascript">
+      var ipAddress = '192.168.178.22';
+      var port = 8008;
+
+    
+
+      var crypto = false;
+      var buffer = false;
+
+      var printer = null;
+
+      var sample = '';
+      var ePosDev = new epson.ePOSDevice();
+
+      function connect() {
+        ePosDev.connect(ipAddress, port, Callback_connect);
+        ePosDev.onreconnecting = OnReconnecting;
+        ePosDev.onreconnect = OnReconnect;
+        ePosDev.ondisconnect = OnDisconnect;
+      }
+
+      function Callback_connect(data) {
+        var deviceID = 'local_printer';
+        crypto = false;
+        buffer = false;
+        var options = {crypto: crypto, buffer: buffer};
+
+        if (data == 'OK') {
+          consolelog('connected to ePOS Device Service Interface.', true);
+          ePosDev.createDevice(
+            deviceID,
+            ePosDev.DEVICE_TYPE_PRINTER,
+            options,
+            callbackCreateDevice_printer,
+          );
+        } else if (data == 'SSL_CONNECT_OK') {
+          consolelog(
+            'connected to ePOS Device Service Interface with SSL.',
+            true,
+          );
+          ePosDev.createDevice(
+            deviceID,
+            ePosDev.DEVICE_TYPE_PRINTER,
+            options,
+            callbackCreateDevice_printer,
+          );
+         
+        } else {
+          consolelog(
+            'connected to ePOS Device Service Interface is failed. [' +
+              data +
+              ']',
+            true,
+          );
+         window.alert('Connection Failed to'+ipAddress+':'+port)
+        }
+      }
+
+      function callbackCreateDevice_printer(data, code) {
+        if (data == null) {
+          consolelog(code);
+          return;
+        }
+
+        consolelog('you can use printer.');
+        window.alert('Connection Successfull to'+ipAddress+':'+port)
+
+        printer = data;
+
+        // Set a response receipt callback function
+        printer.onreceive = function (res) {
+          // Show message
+          consolelog(
+            'Print' +
+              (res.success ? 'Success' : 'Failure') +
+              '\nCode:' +
+              res.code +
+              '\nBattery:' +
+              res.battery +
+              '\n' +
+              //   getStatusText(printer, res.status),
+              true,
+          );
+        };
+        // Set a status change callback funciton
+        printer.onstatuschange = function (status) {
+          if (true) {
+            // alert(getStatusText(printer, status));
+          }
+        };
+        printer.ononline = function () {
+          if (true) {
+            // alert('online');
+          }
+        };
+        printer.onoffline = function () {
+          // if (document.getElementById('ononline').checked) {
+          //   alert('offline');
+          // }
+        };
+        printer.onpoweroff = function () {
+          // if (document.getElementById('ononline').checked) {
+          //   alert('poweroff');
+          // }
+        };
+        printer.oncoverok = function () {
+          // if (document.getElementById('oncoverok').checked) {
+          //   alert('coverok');
+          // }
+        };
+        printer.oncoveropen = function () {
+          // if (document.getElementById('oncoverok').checked) {
+          //   alert('coveropen');
+          // }
+        };
+        printer.onpaperok = function () {
+          // if (document.getElementById('onpaperok').checked) {
+          //   alert('paperok');
+          // }
+        };
+        printer.onpapernearend = function () {
+          // if (document.getElementById('onpaperok').checked) {
+          //   alert('papernearend');
+          // }
+        };
+        printer.onpaperend = function () {
+          // if (document.getElementById('onpaperok').checked) {
+          //   alert('paperend');
+          // }
+        };
+        printer.ondrawerclosed = function () {
+          // if (document.getElementById('ondrawerclosed').checked) {
+          //   alert('drawerclosed');
+          // }
+        };
+        printer.ondraweropen = function () {
+          // if (document.getElementById('ondrawerclosed').checked) {
+          //   alert('draweropen');
+          // }
+        };
+        printer.onbatterystatuschange = function () {
+          // if (document.getElementById('onbatterystatuschange').checked) {
+          //   alert('onbatterystatuschange');
+          // }
+        };
+        printer.onbatteryok = function () {
+          // if (document.getElementById('onbatteryok').checked) {
+          //   alert('onbatteryok');
+          // }
+        };
+        printer.onbatterylow = function () {
+          // if (document.getElementById('onbatteryok').checked) {
+          //   alert('onbatterylow');
+          // }
+        };
+      }
+
+      // process escape sequence (text)
+      function escapeText(s) {
+        var escape = /\\[tnr\\]|\\/g;
+        if (escape.test(s)) {
+          s = s.replace(escape, function (c) {
+            var r = '';
+            switch (c) {
+              case '\\t':
+                r = '\x09';
+                break;
+              case '\\n':
+                r = '\x0a';
+                break;
+              case '\\r':
+                r = '\x0d';
+                break;
+              case '\\\\':
+                r = '\\';
+                break;
+              default:
+                break;
+            }
+            return r;
+          });
+        }
+        return s;
+      }
+
+      function addText() {
+        try {
+          var data = 'Test,\Print!\n';
+          //   var data = 'Test Print!';
+          printer.addText(escapeText(data));
+          console.log('Added text successfully');
+        } catch (e) {
+          alert(e.message);
+        }
+      }
+
+      // send print data
+      function sendMessage() {
+        var temp = printer.message;
+        console.log('Printing');
+        // send
+        printer.send();
+
+        printer.message = '';
+      }
+      function OnReconnecting() {
+        consolelog('onreconnecting');
+      }
+
+      function OnReconnect() {
+        consolelog('onreconnect');
+      }
+
+      function OnDisconnect() {
+        consolelog('ondisconnect');
+      }
+
+      function consolelog(string, option) {
+        var length = arguments.length;
+        var overwrite = length > 1 ? option : false;
+
+        console.log(string);
+        // if (overwrite) {
+        //   document.getElementById("console").value = string + "\r\n";
+        // } else {
+        //   document.getElementById("console").value += string + "\r\n";
+        // }
+        //document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+      }
+
+      function addCut() {
+        //agar message hoga toa hi cut karega
+        try {
+          printer.addCut(printer['CUT_FEED']);
+        } catch (e) {
+          alert(e.message);
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <button onclick="connect()">Connect</button>
+    <button onclick="addText()">Add Text</button>
+    <button onclick="addCut()">Add Cut</button>
+    <button onclick="sendMessage()">Print</button>
+  </body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <script type="text/javascript" src="./epos-2.18.0.js"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/react-native-webview-invoke@0.6.2/dist/browser.umd.js"></script>
+
+    <title>ESC/POS</title>
+  </head>
+  <body>
+    <noscript>Enable javascript to run this app.</noscript>
+    <div id="root">Hello World!</div>
+    <button id="myBtn" onclick="test()">Press Me</button>
+    <button id="test" onclick="myFunction()">Click me</button>
+
+
+  <script>
+
+
+    function myFunction(){
+
+      return alert('hii')
+}
+
+    var invoke = window.WebViewInvoke;
+    invoke.define('whatIsTheNameOfA',whatIsTheNameOfA);
+     invoke.define('tellAYouArea',tellAYouArea);
+    invoke.define('connectPrinter',connectPrinter)
+   
+      function whatIsTheNameOfA() {
+      return 'A'
+  }
+  
+    function tellAYouArea(someone ,prefix) {
+        // return 'Hi, ' + prefix + someone + '!'
+        return 'Hii babumoshaye'
+}
+
+function connectPrinter(host,port){
+        let host = '192.168.178.22';
+        let port  = 9100;
+        var ePosDev = new window.epson.ePOSDevice();
+        ePosDev.connect(host, port, cbConnect);
+
+      
+}
+function cbConnect(data) {
+    alert(data)
+          if (data === 'OK') {
+            ePosDev.createDevice(
+              'local_printer',
+              ePosDev.DEVICE_TYPE_PRINTER,
+              {crypto: true, buffer: false},
+              (devobj, retcode) => {
+                if (retcode === 'OK') {
+                  printer.current = devobj;
+                  setConnectionStatus(STATUS_CONNECTED);
+                  alert(STATUS_CONNECTED)
+                  return STATUS_CONNECTED
+                } else {
+                  throw retcode;
+                }
+              },
+            );
+          } else {
+            throw data;
+          }
+        }
+
+      
+
+
+
+    // document.getElementById('myBtn').addEventListener('click', myFunction);
+    
+    // var invoke = window.WebViewInvoke
+    // invoke.fn.myFunction()
+
+    // function myFunction() {
+    //   window.alert("Invocation Successful")
+    //   console.log("Call from React Native")
+      // console.log('Button Pressed');
+      //   var ePosDev = new window.epson.ePOSDevice();
+      //   ePosDev.connect('192.168.178.22', 9100, cbConnect);
+
+      //   function cbConnect(data) {
+      //     if (data === 'OK') {
+      //       ePosDev.createDevice(
+      //         'local_printer',
+      //         ePosDev.DEVICE_TYPE_PRINTER,
+      //         {crypto: true, buffer: false},
+      //         (devobj, retcode) => {
+      //           if (retcode === 'OK') {
+      //             printer.current = devobj;
+      //             setConnectionStatus(STATUS_CONNECTED);
+      //           } else {
+      //             throw retcode;
+      //           }
+      //         },
+      //       );
+      //     } else {
+      //       throw data;
+      //     }
+      //   }
+    //   var printer = null;
+    //   var ePosDev = new epson.ePOSDevice();
+    //   ePosDev.connect('192.168.178.22', 9100, cbConnect);
+    //   function cbConnect(data) {
+    //     if (data == 'OK' || data == 'SSL_CONNECT_OK') {
+    //       ePosDev.createDevice(
+    //         'local_printer',
+    //         ePosDev.DEVICE_TYPE_PRINTER,
+    //         {crypto: true, buffer: false},
+    //         cbCreateDevice_printer,
+    //       );
+    //     } else {
+    //       alert(data);
+    //     }
+    //   }
+    //   function cbCreateDevice_printer(devobj, retcode) {
+    //     if (retcode == 'OK') {
+    //       printer = devobj;
+    //       printer.timeout = 60000;
+    //       printer.onreceive = function (res) {
+    //         alert(res.success);
+    //       };
+    //       printer.oncoveropen = function () {
+    //         alert('coveropen');
+    //       };
+    //       print();
+    //     } else {
+    //       alert(retcode);
+    //     }
+    //   }
+
+    //   function print() {
+    //     printer.addTextLang('en');
+    //     printer.addText('Printing From IOS device');
+    //     printer.send();
+    //   }
+    // }
+  </script>
+  
+</html>
