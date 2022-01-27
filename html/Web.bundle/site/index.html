@@ -6,12 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test Print</title>
     <!--Script-->
-     <script src="js/epos-2.18.0.js"></script>
+     <script type="text/javascript" src="js/epos-2.18.0.js"></script>
+     <script  type="text/javascript" src="js/browser.umd.js"></script>
     <script type="text/javascript">
-      var ipAddress = '192.168.178.22';
-      var port = 8008;
 
-    
+      var invoke = window.WebViewInvoke
+      invoke  
+    .define('connect', connect)
+    .define('addText', addText)
+    .define('addCut',addCut)
+    .define('sendMessage',sendMessage)
+
+    var stopLoading = invoke.bind('stopLoading')
 
       var crypto = false;
       var buffer = false;
@@ -20,8 +26,15 @@
 
       var sample = '';
       var ePosDev = new epson.ePOSDevice();
+       
+      // var ipAddress = '192.168.178.22';
+      // var port = '8008';
 
-      function connect() {
+      function connect(host,connectport) {
+        // alert('Connecting: '+ipAddress+':'+port)
+        ipAddress = host;
+        port = connectport
+
         ePosDev.connect(ipAddress, port, Callback_connect);
         ePosDev.onreconnecting = OnReconnecting;
         ePosDev.onreconnect = OnReconnect;
@@ -61,7 +74,9 @@
               ']',
             true,
           );
-         window.alert('Connection Failed to'+ipAddress+':'+port)
+         window.alert('Connection Failed to '+ipAddress+':'+port)
+         stopLoading(false)
+         return false
         }
       }
 
@@ -71,9 +86,9 @@
           return;
         }
 
-        consolelog('you can use printer.');
+        // consolelog('you can use printer.');
         window.alert('Connection Successfull to'+ipAddress+':'+port)
-
+        
         printer = data;
 
         // Set a response receipt callback function
@@ -162,6 +177,10 @@
           // 	alert('onbatterylow');
           // }
         };
+      
+        stopLoading(true)
+        return true
+      
       }
 
       // process escape sequence (text)
@@ -206,7 +225,7 @@
       // send print data
       function sendMessage() {
         var temp = printer.message;
-        console.log('Printing');
+      
         // send
         printer.send();
 
@@ -248,14 +267,14 @@
     </script>
   </head>
   <body>
-    <button onclick="connect()">Connect</button>
-    <button onclick="addText()">Add Text</button>
+    <!-- <button onclick="connect()">Connect</button> -->
+    <!-- <button onclick="addText()">Add Text</button>
     <button onclick="addCut()">Add Cut</button>
-    <button onclick="sendMessage()">Print</button>
+    <button onclick="sendMessage()">Print</button> -->
   </body>
 </html>
 
-
+ 
 
 
 
